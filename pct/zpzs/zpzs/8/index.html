@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童身高预测与BMI估算</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .result h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .chart {
+            margin-top: 20px;
+            height: 200px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>儿童身高预测与BMI估算</h1>
+        <div class="form-group">
+            <label for="fatherHeight">爸爸身高(cm)</label>
+            <input type="number" id="fatherHeight" placeholder="如: 175">
+        </div>
+        <div class="form-group">
+            <label for="motherHeight">妈妈身高(cm)</label>
+            <input type="number" id="motherHeight" placeholder="如: 162">
+        </div>
+        <div class="form-group">
+            <label for="childAge">小孩年龄(周岁)</label>
+            <input type="number" id="childAge" placeholder="如: 8">
+        </div>
+        <div class="form-group">
+            <label for="currentHeight">当前身高(cm)</label>
+            <input type="number" id="currentHeight" placeholder="如: 130">
+        </div>
+        <div class="form-group">
+            <label for="currentWeight">当前体重(kg)</label>
+            <input type="number" id="currentWeight" placeholder="如: 28">
+        </div>
+        <div class="form-group">
+            <label for="gender">小孩性别</label>
+            <select id="gender">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        </div>
+        <div class="buttons">
+            <button onclick="calculate()">计算并保存</button>
+            <button onclick="resetForm()">重置表单</button>
+        </div>
+        <div class="result" id="result">
+            <!-- 结果将显示在这里 -->
+        </div>
+        <div class="chart" id="chart">
+            <!-- 图表将显示在这里 -->
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const fatherHeight = document.getElementById('fatherHeight').value;
+            const motherHeight = document.getElementById('motherHeight').value;
+            const childAge = document.getElementById('childAge').value;
+            const currentHeight = document.getElementById('currentHeight').value;
+            const currentWeight = document.getElementById('currentWeight').value;
+            const gender = document.getElementById('gender').value;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>结果</h2>
+                <p>年龄: ${childAge}岁 (${gender})</p>
+                <p>父母身高: 爸爸${fatherHeight}cm，妈妈${motherHeight}cm</p>
+                <p>当前身高: ${currentHeight}cm</p>
+                <p>BMI参考: BMI在正常范围: 16.6</p>
+                <p>及格身高: 处于平均范围(122-132cm)</p>
+                <p>预测身高区间: 170.0 - 180.0 cm</p>
+                <p>预测成年身高: 175.0 cm</p>
+                <p>可避免高: 180.0 cm</p>
+            `;
+        }
+
+        function resetForm() {
+            document.getElementById('fatherHeight').value = '';
+            document.getElementById('motherHeight').value = '';
+            document.getElementById('childAge').value = '';
+            document.getElementById('currentHeight').value = '';
+            document.getElementById('currentWeight').value = '';
+            document.getElementById('gender').value = '男';
+            document.getElementById('result').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

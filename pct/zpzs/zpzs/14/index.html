@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刮出你的专属文案</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('ziti.woff2') format('woff2'),
+                 url('ziti.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'CustomFont', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s ease-in-out;
+      }
+        .scratch-card {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        
+        #scratchCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            z-index: 2;
+        }
+
+ 
+        .message-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            font-size: 1.5rem;
+            color: #333;
+            text-align: center;
+            background: transparent;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+
+        .scratch-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #666;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+       
+        .premium-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+       
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+     
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .scratch-card {
+                height: 250px;
+            }
+
+            .message-container {
+                font-size: 1.2rem;
+            }
+
+            .scratch-hint {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>刮刮乐 - 刮出你的专属文案 <i class="fas fa-magic"></i></h1>
+        <div class="scratch-card">
+            <canvas id="scratchCanvas"></canvas>
+            <div class="message-container" id="messageBox"></div>
+            <div class="scratch-hint" id="scratchHint">刮开查看</div>
+        </div>
+        <button class="premium-btn" id="resetBtn"><i class="fas fa-redo"></i> 重置刮卡</button>
+    </div>
+
+    <script>
+        class ScratchCard {
+            constructor() {
+                this.canvas = document.getElementById('scratchCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.messageBox = document.getElementById('messageBox');
+                this.scratchHint = document.getElementById('scratchHint');
+                this.isDrawing = false;
+                this.lastPoint = null;
+                this.radius = 20;
+                this.init();
+            }
+
+            init() {
+                this.setCanvasSize();
+                this.initCanvas();
+                this.bindEvents();
+                this.loadQuote();
+            }
+
+            setCanvasSize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+
+            initCanvas() {
+                this.ctx.globalCompositeOperation = 'source-over';
+                this.ctx.fillStyle = '#cccccc';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.globalCompositeOperation = 'destination-out';
+            }
+
+            bindEvents() {
+                const events = {
+                    mousedown: e => this.startScratch(e),
+                    mousemove: e => this.scratch(e),
+                    mouseup: () => this.endScratch(),
+                    touchstart: e => this.startScratch(e.touches[0]),
+                    touchmove: e => {
+                        e.preventDefault();
+                        this.scratch(e.touches[0]);
+                    },
+                    touchend: () => this.endScratch()
+                };
+
+                Object.entries(events).forEach(([type, handler]) => {
+                    this.canvas.addEventListener(type, handler);
+                });
+            }
+
+            startScratch(e) {
+                this.isDrawing = true;
+                this.lastPoint = this.getMousePosition(e);
+            }
+
+            scratch(e) {
+                if (!this.isDrawing) return;
+                const currentPoint = this.getMousePosition(e);
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.lastPoint.x, this.lastPoint.y);
+                this.ctx.lineTo(currentPoint.x, currentPoint.y);
+                this.ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
+                this.ctx.lineWidth = this.radius * 2;
+                this.ctx.lineCap = 'round';
+                this.ctx.stroke();
+                this.lastPoint = currentPoint;
+                this.checkProgress();
+            }
+
+            endScratch() {
+                this.isDrawing = false;
+            }
+
+            getMousePosition(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+
+            checkProgress() {
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+                let transparentPixels = 0;
+                for (let i = 3; i < imageData.length; i += 4) {
+                    if (imageData[i] === 0) transparentPixels++;
+                }
+                const progress = (transparentPixels / (this.canvas.width * this.canvas.height)) * 100;
+                if (progress > 50) {
+                    this.scratchHint.style.display = 'none'; // 隐藏提示
+                    this.messageBox.style.opacity = 1; // 显示文案
+                }
+            }
+
+            loadQuote() {
+                fetch('https://www.hhlqilongzhu.cn/api/yiyan.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络响应异常');
+                        }
+                        return response.text(); // 注意：API 返回的是纯文本，不是 JSON
+                    })
+                    .then(data => {
+                        this.messageBox.textContent = data; // 直接显示返回的文本
+                    })
+                    .catch(() => {
+                        this.messageBox.textContent = '加载失败，请稍后重试';
+                    });
+            }
+
+            reset() {
+                this.initCanvas();
+                this.scratchHint.style.display = 'block'; // 显示提示
+                this.messageBox.style.opacity = 0; // 隐藏文案
+                this.loadQuote(); // 刷新文案
+            }
+        }
+
+        // 初始化刮刮乐
+        const sc = new ScratchCard();
+        document.getElementById('resetBtn').addEventListener('click', () => sc.reset());
+    </script>
+</body>
+</html>

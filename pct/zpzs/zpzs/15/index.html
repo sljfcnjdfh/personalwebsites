@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抖音实时热榜</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'ziti';
+            src: url('ziti.woff2') format('woff2'),
+                 url('ziti.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-color: #FF0050;
+            --secondary-color: #FF005020;
+            --text-primary: #1A1A1A;
+            --bg-gradient: linear-gradient(135deg, #000000 0%, #2D2D2D 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'ziti', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #FF0050, #FF7F00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #AAAAAA;
+            font-size: 1rem;
+        }
+
+        .update-time {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666666;
+        }
+
+        .hot-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .hot-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .hot-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 0, 80, 0.2);
+            background: rgba(255, 0, 80, 0.05);
+        }
+
+        .rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .rank-1 { color: #FF0050; }
+        .rank-2 { color: #FF3A6E; }
+        .rank-3 { color: #FF6B9B; }
+
+        .content {
+            flex: 1;
+        }
+
+        .hot-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hot-value {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #FF0050;
+            gap: 0.5rem;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            visibility: hidden;
+            min-width: 150px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .hot-item {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    
+    <div class="container" style="display: none;">
+        <div class="header">
+            <h1 class="title"><i class="fab fa-tiktok"></i> 抖音热搜榜</h1>
+            <p class="subtitle">全网实时热点 即刻追踪</p>
+            <p class="update-time" id="updateTime"></p>
+        </div>
+        <div class="hot-list" id="hotList"></div>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>数据加载成功</span>
+    </div>
+
+    <script>
+        const loader = document.querySelector('.loader');
+        const container = document.querySelector('.container');
+        const toast = document.getElementById('toast');
+
+        async function fetchHotList() {
+            try {
+                const response = await fetch('https://api.cenguigui.cn/api/juhe/hotlist.php?type=douyin');
+                const data = await response.json();
+                
+                if(data.success) {
+                    renderHotList(data);
+                    showToast('数据加载成功', 'success');
+                }
+            } catch (error) {
+                showToast('数据加载失败', 'error');
+                console.error('获取数据失败:', error);
+            } finally {
+                loader.style.display = 'none';
+                container.style.display = 'block';
+            }
+        }
+
+        function renderHotList(data) {
+            const listContainer = document.getElementById('hotList');
+            const updateTime = document.getElementById('updateTime');
+            
+            updateTime.innerHTML = `<i class="fas fa-clock"></i> 更新时间：${data.update_time}`;
+            
+            const listHTML = data.data.map(item => `
+                <div class="hot-item" onclick="window.open('${item.url}', '_blank')">
+                    <div class="rank ${item.index <= 3 ? `rank-${item.index}` : ''}">
+                        ${item.index}
+                    </div>
+                    <div class="content">
+                        <div class="hot-title">${item.title}</div>
+                        <div class="hot-value">
+                            <i class="fas fa-fire"></i>
+                            ${item.hot}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            listContainer.innerHTML = listHTML;
+        }
+
+        function showToast(message, type) {
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        fetchHotList();
+        setInterval(fetchHotList, 10000);
+    </script>
+</body>
+</html>

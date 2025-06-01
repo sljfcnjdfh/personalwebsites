@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌词播放器</title>
+    <style>
+        :root {
+            --primary-color: #4ECDC4;
+            --secondary-color: #FF6B6B;
+            --control-height: 100px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Microsoft YaHei', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .player-container {
+            width: 800px;
+            max-width: 90%;
+            margin: 2rem auto;
+        }
+
+        .control-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .progress-container {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                var(--primary-color) 0%,
+                var(--secondary-color) 100%);
+            width: 0;
+            transition: width 0.1s linear;
+        }
+
+        .lyrics-box {
+            height: 60vh;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(
+                to bottom, 
+                transparent 0%, 
+                rgba(0,0,0,1) 10%, 
+                rgba(0,0,0,1) 90%, 
+                transparent 100%
+            );
+        }
+
+        .lyrics-content {
+            transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+            will-change: transform;
+        }
+
+        .lyric-line {
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            opacity: 0.3;
+            transform: scale(0.95);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            text-align: center;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lyric-line.active {
+            opacity: 1;
+            transform: scale(1.1);
+            color: var(--primary-color);
+            text-shadow: 0 0 15px rgba(78,205,196,0.5);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 1rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .time-display {
+            font-size: 1em;
+            opacity: 0.8;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* 按钮图标动画 */
+        #playBtn i {
+            transition: transform 0.3s ease;
+        }
+
+        .playing #playBtn i {
+            transform: rotate(360deg);
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="player-container">
+        <h1>心如止水 - Ice Paper</h1>
+        
+        <div class="lyrics-box">
+            <div class="lyrics-content"></div>
+        </div>
+
+        <div class="control-panel">
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+
+            <div class="controls">
+                <button id="prevBtn">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button id="playBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button id="nextBtn">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span> / 
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="lyricsData" type="text/plain">
+[00:00.36]心如止水 - Ice Paper
+[00:00.65]作词：Ice Paper
+[00:00.95]作曲：Ice Paper
+[00:01.15]Talking to the moon
+[00:02.54]放不下的理由
+[00:04.33]是不是会担心
+[00:06.13]变成一只野兽
+[00:08.52]Walking on the roof
+[00:09.92]为心跳的节奏
+[00:11.78]是不是会暂停
+[00:13.69]在世界的尽头
+[00:16.77]浸泡在十公升的瓶里
+[00:19.38]单纯想要呼吸
+[00:21.21]讨厌云里雾里
+[00:24.16]出没在被遗忘的抽屉
+[00:26.85]你曾经的手笔
+[00:28.71]写着心口不一
+[00:31.64]现在是黑夜白昼我都随便
+[00:35.68]像迷路的天鹅游失在水面
+[00:39.23]尽力去捕捉恶梦里的碎片
+[00:43.21]不需要你的歌来帮我催眠
+[00:46.04]Talking to the moon
+[00:47.35]放不下的理由
+[00:49.18]是不是会担心
+[00:51.25]变成一只野兽
+[00:53.51]Walking on the roof
+[00:55.04]为心跳的节奏
+[00:56.79]是不是会暂停
+[00:58.76]在世界的尽头
+[01:01.06]说不完的话
+[01:02.45]找不完的借口
+[01:04.36]是不是会狠心
+[01:06.26]把我骄傲解剖
+[01:08.46]爱着谁的她
+[01:10.05]能否将你接受
+[01:11.80]是不是会上瘾
+[01:13.73]拜托慢些降落
+[01:15.93]华丽的红房间
+[01:17.57]发霉的旧唱片
+[01:19.43]没必要听个遍
+[01:21.32]掉了漆的播放键
+[01:23.31]你情愿冒着险
+[01:25.13]睡在他的身边
+[01:26.94]没耐心去分辨
+[01:28.91]谁和谁能够走多远
+[01:31.14]穿过几条街就能找到关键
+[01:34.67]解开我的问题没什么悬念
+[01:38.36]转了几个弯还是回到原点
+[01:42.22]我该如何出现在你的面前
+[01:46.17]Talking to the moon
+[01:47.49]放不下的理由
+[01:49.30]是不是会担心
+[01:51.21]变成一只野兽
+[01:53.43]Walking on the roof
+[01:54.99]为心跳的节奏
+[01:56.83]是不是会暂停
+[01:58.73]在世界的尽头
+[02:01.09]说不完的话
+[02:02.44]找不完的借口
+[02:04.24]是不是会狠心
+[02:06.11]把我骄傲解剖
+[02:08.48]爱着谁的她
+[02:09.91]能否将你接受
+[02:11.74]是不是会上瘾
+[02:13.68]拜托慢些降落
+[02:16.02]Talking to the moon
+[02:17.46]放不下的理由
+[02:19.28]是不是会担心
+[02:21.17]变成一只野兽
+[02:23.52]Walking on the roof
+[02:24.95]为心跳的节奏
+[02:26.84]是不是会暂停
+[02:28.65]在世界的尽头
+[02:31.02]说不完的话
+[02:32.43]找不完的借口
+[02:34.24]是不是会狠心
+[02:36.17]把我骄傲解剖
+[02:38.56]爱着谁的她
+[02:39.93]能否将你接受
+[02:41.69]是不是会上瘾
+[02:43.66]拜托慢些降落
+    </script>
+
+    <script>
+        class LyricsPlayer {
+            constructor() {
+                this.audio = new Audio();
+                this.lyricsContent = document.querySelector('.lyrics-content');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.progressContainer = document.querySelector('.progress-container');
+                this.playBtn = document.getElementById('playBtn');
+                this.currentTimeDisplay = document.getElementById('currentTime');
+                this.durationDisplay = document.getElementById('duration');
+                
+                // 初始化
+                this.lyrics = this.parseLyrics();
+                this.initPlayer();
+                this.bindEvents();
+                this.createLyricsDOM();
+                this.centerOffset = this.calculateCenterOffset();
+            }
+
+            parseLyrics() {
+                const rawText = document.getElementById('lyricsData').textContent;
+                return rawText.split('\n')
+                    .filter(line => line.trim())
+                    .map(line => {
+                        const match = line.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
+                        if (match) {
+                            const minutes = parseInt(match[1]);
+                            const seconds = parseFloat(match[2]);
+                            return {
+                                time: minutes * 60 + seconds - 0.35,      // 歌词延迟 有需要自己调
+                                text: match[3].trim()
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+            }
+
+            createLyricsDOM() {
+                this.lyricsContent.innerHTML = this.lyrics
+                    .map(lyric => `
+                        <div class="lyric-line" data-time="${lyric.time}">
+                            ${lyric.text}
+                        </div>
+                    `)
+                    .join('');
+            }
+
+            initPlayer() {
+                this.audio.src = '1000012529.mp3';
+            }
+
+            bindEvents() {
+                // 播放/暂停控制
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                
+                // 进度条点击跳转
+                this.progressContainer.addEventListener('click', (e) => this.seek(e));
+                
+                // 音频事件
+                this.audio.addEventListener('timeupdate', () => this.updateProgress());
+                this.audio.addEventListener('play', () => this.updatePlayState(true));
+                this.audio.addEventListener('pause', () => this.updatePlayState(false));
+                this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+
+                // 上一首/下一首按钮  Ps：其实就是修改时间的
+                document.getElementById('prevBtn').addEventListener('click', () => this.skip(-10));
+                document.getElementById('nextBtn').addEventListener('click', () => this.skip(10));
+            }
+
+            calculateCenterOffset() {
+                const lyricsBox = document.querySelector('.lyrics-box');
+                return lyricsBox.offsetHeight / 2 - 30;
+            }
+
+            togglePlay() {
+                this.audio.paused ? this.audio.play() : this.audio.pause();
+            }
+
+            seek(e) {
+                const rect = e.target.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                this.audio.currentTime = percent * this.audio.duration;
+            }
+
+            updateProgress() {
+                // 更新进度条
+                const progress = (this.audio.currentTime / this.audio.duration) * 100;
+                this.progressBar.style.width = `${progress}%`;
+
+                // 更新时间显示
+                this.currentTimeDisplay.textContent = this.formatTime(this.audio.currentTime);
+
+                // 更新歌词
+                const currentTime = this.audio.currentTime;
+                const activeIndex = this.findActiveLyricIndex(currentTime);
+                this.highlightLyric(activeIndex);
+                this.autoScrollLyrics(activeIndex);
+            }
+
+            findActiveLyricIndex(currentTime) {
+                for (let i = this.lyrics.length - 1; i >= 0; i--) {
+                    if (currentTime >= this.lyrics[i].time) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+
+            highlightLyric(index) {
+                document.querySelectorAll('.lyric-line').forEach((line, i) => {
+                    line.classList.toggle('active', i === index);
+                });
+            }
+
+            autoScrollLyrics(activeIndex) {
+                const activeLine = this.lyricsContent.children[activeIndex];
+                if (!activeLine) return;
+
+                const lineTop = activeLine.offsetTop;
+                const targetPosition = lineTop - this.centerOffset;
+                
+                this.lyricsContent.style.transform = `translateY(-${targetPosition}px)`;
+            }
+
+            updatePlayState(playing) {
+                document.body.classList.toggle('playing', playing);
+                this.playBtn.innerHTML = playing ? 
+                    '<i class="fas fa-pause"></i>' : 
+                    '<i class="fas fa-play"></i>';
+            }
+
+            updateDuration() {
+                this.durationDisplay.textContent = this.formatTime(this.audio.duration);
+            }
+
+            skip(seconds) {
+                this.audio.currentTime += seconds;
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // 初始化播放器
+        document.addEventListener('DOMContentLoaded', () => {
+            new LyricsPlayer();
+        });
+    </script>
+</body>
+</html>

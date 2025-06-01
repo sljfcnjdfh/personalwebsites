@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球电影票房实时排行榜</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('ziti.woff2') format('woff2'),
+                 url('ziti.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #00ff88;
+            --text: #e0e0e0;
+            --text-secondary: #888;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="light"] {
+            --dark-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --accent: #007bff;
+            --text: #333333;
+            --text-secondary: #666666;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'CustomFont', 'Poppins', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--accent), #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .disclaimer {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+
+        .rankings {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        .movie-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .rank {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .movie-info {
+            flex: 1;
+        }
+
+        .movie-name {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+            color: var(--accent);
+            z-index: 1001;
+        }
+
+        .alert {
+            position: fixed;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 230px;
+        }
+
+        .alert.show {
+            top: 20px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.3rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            .rankings {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span class="message"></span>
+    </div>
+
+    <div class="loading" id="loading">
+        <i class="fas fa-spinner"></i>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">
+                <i class="fas fa-film"></i>
+                全球票房实时排行榜
+            </h1>
+            <p class="subtitle">数据每 10 秒自动更新</p>
+            <p class="disclaimer">数据来源：猫眼电影</p>
+            <p class="disclaimer">汇率采用 2025 年 1 月 31 日市场汇率</p>
+        </div>
+        <div class="rankings" id="rankings"></div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        const API_URL = 'https://piaofang.maoyan.com/i/api/rank/globalBox/historyRankList';
+        const alertEl = document.querySelector('.alert');
+        const loadingEl = document.getElementById('loading');
+        const rankingsEl = document.getElementById('rankings');
+        const themeToggle = document.getElementById('themeToggle');
+        let retryCount = 0;
+
+        function showAlert(message, type = 'error') {
+            alertEl.querySelector('.message').textContent = message;
+            alertEl.classList.add('show');
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 3000);
+        }
+
+        function createMovieCard(movie, rank) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            
+            const rankClass = `rank-${rank}`;
+            card.innerHTML = `
+                <div class="rank ${rankClass}">#${rank}</div>
+                <div class="movie-info">
+                    <h3 class="movie-name">${movie.movieName}</h3>
+                    <div class="stats">
+                        <span><i class="fas fa-ticket-alt"></i> 票房：${movie.box} 亿</span>
+                        <span><i class="fas fa-calendar-alt"></i> 上映时间：${movie.releaseTime}</span>
+                        <span><i class="fas fa-coins"></i> 总票房：${movie.rawValue} 元</span>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        async function fetchData() {
+            try {
+                loadingEl.style.display = 'block';
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('请求失败');
+                const { data } = await response.json();
+                
+                rankingsEl.innerHTML = '';
+                data.list.slice(0, 20).forEach((movie, index) => {
+                    rankingsEl.appendChild(createMovieCard(movie, index + 1));
+                });
+                
+                retryCount = 0;
+            } catch (error) {
+                showAlert('数据更新失败，正在重试...');
+                if (retryCount < 3) {
+                    setTimeout(fetchData, 3000);
+                    retryCount++;
+                }
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            themeToggle.innerHTML = isDark
+                ? `<i class="fas fa-sun"></i>`
+                : `<i class="fas fa-moon"></i>`;
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        fetchData();
+        setInterval(fetchData, 10000);
+
+        window.addEventListener('load', () => {
+            document.querySelector('.container').style.opacity = 1;
+        });
+    </script>
+</body>
+</html>

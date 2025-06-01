@@ -1,0 +1,144 @@
+<!doctype html> 
+<html> 
+<head> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+    
+	
+    <title>字数统计</title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="index/plugns/bootstrap/css/bootstrap.min.css">
+    
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="index/js/jquery.min.js"></script>
+    
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="index/plugns/bootstrap/js/bootstrap.min.js"></script>
+    
+    <!-- 页面通用自定义css文件 -->
+    <link rel="stylesheet" href="index/css/style.css" />
+    
+<script src="ZeroClipboard.min.js"></script>
+<style>
+.btns .btn {
+    margin-bottom: 10px;
+}
+</style>
+
+<script src="count.js"></script>
+
+</head> 
+
+<body>
+
+<div id="particles"></div>
+<div><br></div>
+<div class="container">
+    
+
+<div class="panel panel-default">
+    <div class="panel-heading">字数统计</div>
+    <div class="panel-body text-center">
+        <div class="row">
+        <div class="col-sm-8">
+            <textarea class="form-control" rows="14" id="content" placeholder="在这里贴入文字内容" style="margin-bottom: 10px"></textarea>
+            
+            <div class="btns">
+            <button class="btn btn-info" onclick="count()">
+                统计字数
+            </button>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-success" onclick="format()">一键排版</button>
+                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:;" onclick="noSpace()">去行尾空格</a></li>
+                    <li><a href="javascript:;" onclick="noEmptyLines()">删除空行</a></li>
+                    <!--<li role="separator" class="divider"></li>-->
+                </ul>
+            </div>
+            
+            <button class="btn btn-warning" id="copy" data-clipboard-target="content">
+                复制
+            </button>
+            
+            <button class="btn btn-default" onclick="$('#content').val('');">
+                清空
+            </button>
+            
+            </div>
+        </div>
+        
+        <div class="col-sm-4">
+            
+            <table class="table table-bordered table-hover">
+            <tr>
+                <td style="width: 100px">总字数</td>
+                <td><span id="id_total">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td>总行数</td>
+                <td><span id="id_part">0</span> (行)</td>
+            </tr>
+            
+            <tr>
+                <td class="">中文字数</td>
+                <td class=""><span id="id_c_total">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">中文标点</td>
+                <td class=""><span id="id_c_punctuation">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">字母个数</td>
+                <td class=""><span id="id_e_total">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">单词个数</td>
+                <td class=""><span id="id_e_words">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">英文标点</td>
+                <td class=""><span id="id_e_punctuation">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">数字个数</td>
+                <td class=""><span id="id_n_total">0</span> (个)</td>
+            </tr>
+            
+            <tr>
+                <td class="">数字组</td>
+                <td class=""><span id="id_n_words">0</span> (个)</td>
+            </tr>
+            
+            </table>
+        </div>
+        </div> <!-- row -->
+    </div>
+</div>
+
+<script>
+var contentObj = $('#content');
+
+contentObj.bind('input propertychange change',function(){ 
+    count();
+});
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading">工具简介</div>
+    <div class="panel-body">
+        <p>在线统计字数，在线排版</p>
+    </div>
+</div>
+<script src="https://www.97abc.com/js/script.js"></script>
+</body> 
+</html> 

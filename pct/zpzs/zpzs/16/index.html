@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>蜀汉历史时空图</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('ziti.woff2') format('woff2'),
+                 url('ziti.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-color: #d32f2f;
+            --secondary-color: #ffa726;
+            --timeline-height: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            font-family: 'CustomFont', 'Microsoft Yahei', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header i {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-right: 20px;
+            text-shadow: 0 0 10px rgba(255,167,38,0.7);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+
+        .timeline-container {
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .timeline-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .year-display {
+            font-size: 3em;
+            color: var(--secondary-color);
+            text-shadow: 0 0 15px rgba(255,167,38,0.5);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            flex-grow: 1;
+            height: var(--timeline-height);
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--timeline-height);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .character-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+            height: 120px;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 15px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05));
+            pointer-events: none;
+        }
+
+        .character-card.inactive {
+            filter: grayscale(1) brightness(0.5);
+        }
+
+        .card-content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+        }
+
+        .name-section, .age-section {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .name {
+            font-size: 1.4em;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .name:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .status {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            opacity: 0.7;
+        }
+
+        .age-display {
+            font-size: 2em;
+            color: var(--primary-color);
+            font-weight: bold;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .age-display::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(15deg);
+            height: 70%;
+            width: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .footer i {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 900px) {
+            .character-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <i class="fas fa-landmark"></i>
+            <h1>蜀汉历史人物时空图谱</h1>
+        </header>
+
+        <div class="timeline-container">
+            <div class="year-display" id="yearDisplay">161年</div>
+            <div class="timeline-controls">
+                <button class="control-btn" id="playBtn"><i class="fas fa-play"></i></button>
+                <input type="range" id="timeline" min="161" max="280" value="161">
+            </div>
+        </div>
+        
+        <div class="character-grid" id="characterGrid"></div>
+        
+        <div class="footer">
+            <i class="fas fa-info-circle"></i>
+            <span>人物生卒年信息仅供参考，点击人物姓名可搜索详情</span>
+        </div>
+    </div>
+
+    <button class="music-control" id="musicBtn">
+        <i class="fas fa-music"></i>
+    </button>
+
+    <audio id="bgMusic" loop>
+        <source src="music.m4a" type="audio/mp4">
+    </audio>
+
+    <script>
+        const characters = [
+            { name: '刘备', birth: 161, death: 223, occupation: '君主' },
+            { name: '诸葛亮', birth: 181, death: 234, occupation: '丞相' },
+            { name: '关羽', birth: 160, death: 220, occupation: '武将' },
+            { name: '张飞', birth: 168, death: 221, occupation: '武将' },
+            { name: '赵云', birth: 168, death: 229, occupation: '武将' },
+            { name: '黄忠', birth: 147, death: 220, occupation: '武将' },
+            { name: '马超', birth: 176, death: 222, occupation: '武将' },
+            { name: '魏延', birth: 174, death: 234, occupation: '武将' },
+            { name: '法正', birth: 176, death: 220, occupation: '谋士' },
+            { name: '刘禅', birth: 207, death: 271, occupation: '后主' },
+            { name: '庞统', birth: 179, death: 214, occupation: '谋士' },
+            { name: '姜维', birth: 202, death: 264, occupation: '武将' },
+            { name: '蒋琬', birth: 168, death: 246, occupation: '丞相' },
+            { name: '费祎', birth: 190, death: 253, occupation: '丞相' },
+            { name: '马良', birth: 187, death: 222, occupation: '谋士' },
+            { name: '马谡', birth: 190, death: 228, occupation: '谋士' },
+            { name: '徐庶', birth: 168, death: 234, occupation: '谋士' },
+            { name: '孙乾', birth: 170, death: 215, occupation: '文官' },
+            { name: '简雍', birth: 165, death: 220, occupation: '文官' },
+            { name: '糜竺', birth: 170, death: 220, occupation: '文官' },
+            { name: '糜芳', birth: 172, death: 223, occupation: '武将' },
+            { name: '廖化', birth: 190, death: 264, occupation: '武将' },
+            { name: '周仓', birth: 170, death: 229, occupation: '武将' },
+            { name: '关平', birth: 178, death: 220, occupation: '武将' },
+            { name: '关兴', birth: 200, death: 230, occupation: '武将' },
+            { name: '张苞', birth: 198, death: 230, occupation: '武将' },
+            { name: '王平', birth: 190, death: 248, occupation: '武将' },
+            { name: '吴懿', birth: 170, death: 237, occupation: '武将' },
+            { name: '吴班', birth: 175, death: 234, occupation: '武将' },
+            { name: '李严', birth: 180, death: 234, occupation: '武将' },
+            { name: '黄权', birth: 175, death: 240, occupation: '谋士' },
+            { name: '刘封', birth: 190, death: 220, occupation: '武将' },
+            { name: '孟达', birth: 175, death: 228, occupation: '武将' },
+            { name: '陈到', birth: 170, death: 230, occupation: '武将' },
+            { name: '霍峻', birth: 178, death: 217, occupation: '武将' },
+            { name: '向宠', birth: 200, death: 240, occupation: '武将' },
+            { name: '向朗', birth: 180, death: 247, occupation: '文官' },
+            { name: '董允', birth: 190, death: 246, occupation: '文官' },
+            { name: '邓芝', birth: 178, death: 251, occupation: '文官' },
+            { name: '张嶷', birth: 190, death: 254, occupation: '武将' },
+            { name: '张翼', birth: 190, death: 264, occupation: '武将' },
+            { name: '夏侯霸', birth: 190, death: 255, occupation: '武将' },
+            { name: '傅佥', birth: 210, death: 263, occupation: '武将' },
+            { name: '诸葛瞻', birth: 227, death: 263, occupation: '武将' },
+            { name: '诸葛尚', birth: 244, death: 263, occupation: '武将' },
+            { name: '傅彤', birth: 200, death: 222, occupation: '武将' },
+            { name: '程畿', birth: 170, death: 222, occupation: '文官' },
+            { name: '赵累', birth: 180, death: 219, occupation: '文官' },
+            { name: '杨仪', birth: 180, death: 235, occupation: '文官' },
+            { name: '谯周', birth: 201, death: 270, occupation: '文官' },
+            { name: '李恢', birth: 175, death: 231, occupation: '武将' }
+        ];
+
+        let currentYear = 161;
+        let isPlaying = false;
+        let isMusicPlaying = false;
+        let intervalId = null;
+        const speed = 500;
+        const bgMusic = document.getElementById('bgMusic');
+
+        function renderCharacters(year) {
+            const grid = document.getElementById('characterGrid');
+            grid.innerHTML = '';
+
+            characters.forEach(char => {
+                const card = document.createElement('div');
+                const age = Math.min(Math.max(year - char.birth, 0), char.death - char.birth);
+                const status = year < char.birth ? '未出生' : year > char.death ? '已逝世' : '活跃期';
+                
+                card.className = `character-card ${status !== '活跃期' ? 'inactive' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="card-content">
+                        <div class="name-section">
+                            <span class="name">${char.name}</span>
+                            <span class="status">${status}</span>
+                        </div>
+                        <div class="age-section">
+                            <span class="age-display">${status === '活跃期' ? age + '岁' : char.occupation}</span>
+                        </div>
+                    </div>
+                `;
+
+                // 点击名字跳转
+                const nameElement = card.querySelector('.name');
+                nameElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.open(`https://m.baidu.com/s?word=${encodeURIComponent(char.name)}`, '_blank');
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        function updateYear(newYear) {
+            currentYear = Math.min(Math.max(newYear, 161), 280);
+            document.getElementById('yearDisplay').textContent = `${currentYear}年`;
+            document.getElementById('timeline').value = currentYear;
+            renderCharacters(currentYear);
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playBtn = document.getElementById('playBtn');
+            playBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+
+            if(isPlaying) {
+                intervalId = setInterval(() => {
+                    if(currentYear >= 280) {
+                        togglePlay();
+                        return;
+                    }
+                    updateYear(currentYear + 1);
+                }, speed);
+            } else {
+                clearInterval(intervalId);
+            }
+        }
+
+        function toggleMusic() {
+            isMusicPlaying = !isMusicPlaying;
+            const musicBtn = document.getElementById('musicBtn');
+            
+            if(isMusicPlaying) {
+                bgMusic.play();
+                musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                bgMusic.pause();
+                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            }
+        }
+
+        document.getElementById('timeline').addEventListener('input', (e) => {
+            updateYear(parseInt(e.target.value));
+            if(isPlaying) togglePlay();
+        });
+
+        document.getElementById('playBtn').addEventListener('click', togglePlay);
+        document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+
+        updateYear(161);
+    </script>
+</body>
+</html>
