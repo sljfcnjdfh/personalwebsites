@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--导入bootstrap.css框架-->
+    <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css">
+    <link href="icon.png" rel="icon" />
+	<title>手速测试</title>
+  </head>
+  
+    <style>
+      /*总体样式*/
+      *{
+        margin:0;
+        padding:0;
+        }
+      /*导入字体样式*/
+      @font-face{
+        src:url('ttf/3D.ttf');
+        font-family:'3D';
+        }
+      /*导航栏样式*/
+      .div1{
+        width:100%;
+        height:50px;
+        background-color:skyblue;
+        font-size:22px;
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        color:black;
+        font-weight:bold;
+        border-bottom:1px #ededed solid;
+        }
+      .div2{
+        width:100%;
+        height:50px;
+        background-color:skyblue;
+        display:flex;
+        }
+      .div3,.div4,.div5{
+        width:0;
+        flex:1;
+        }
+      .div3,.div4{
+        border-right:1px #ededed solid;
+        }
+      .div2 div{
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        font-weight:bold;
+        color:white;
+        }
+      .div4{
+        font-family:'3D';
+        }
+      /*输入以及表格样式*/
+      .div6{
+        width:100%;
+        height:0px;
+        background-color:#00c1ff;
+        border-top:1px #ededed solid;
+        overflow:auto;
+        transition:0.5s;
+        }
+      .div6 p{
+        text-align:center;
+        color:red;
+        font-weight:bold;
+        }
+      #input1{
+        /*width:70%;*/
+        margin:5px auto;
+        }
+      .div8{
+        width:100%;
+        height:50px;
+        background-color:#0085ff;
+        display:flex;
+        }
+      .div8 p{
+        height:100%;
+        width:0;
+        flex:1;
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        }
+      .div11{
+        width:150px;
+        height:45px;
+        background-color:rgba(220,220,220,0.5);
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        margin:auto;
+        border-radius:0.8em;
+        color:#AFAFAF;
+        font-weight:bold;
+        border:1px black solid;
+        transition:0.5s;
+        }
+      .div11:hover{
+        box-shadow:0px 0px 4px black ,0px 0px 8px gray;
+        background-color:rgba(255,255,255,0);
+        }
+      .p1{
+        border-right:1px #ededed solid;
+        }
+      /*点击按钮样式*/
+      .div9{
+        width:150px;
+        height:150px;
+        background-color:#00ffec;
+        margin:50px auto;
+        border-radius:100%;
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        }
+      .div9:active{
+        background-color:#00ddbd;
+        }
+      .div10{
+        width:60%;
+        height:40px;
+        margin:30px auto;
+        background-color:skyblue;
+        border-radius:0.2em;
+        display:flex;
+        align-Items:center;
+        justify-content:center;
+        transition:0.2s;
+        }
+      .div10:active{
+        background-color:#b7fffa;
+        color:blue;
+        }
+      .div10:hover{
+        text-decoration:underline;
+        }
+      /*表格样式*/
+      #td ,#td2 ,#td3{
+        color:yellow;
+        }
+    </style>
+  
+  <body>
+    <!--导航栏结构-->	
+	<div class="div1">手速测试</div>
+    <div class="div2">
+      <div class="div3" id="div3">收起</div>
+      <div class="div4" id="div4">Click</div>
+      <div class="div5" id="div5">设置</div>
+    </div>
+    
+    <div class="div6" id="div6">
+      
+      <!--表格信息-->
+      <table class="table table-bordered">
+        <tr>
+          <td>上次记录：</td>
+          <td id="td">0次</td>
+        </tr>
+        <tr>
+          <td>上次用时：</td>
+          <td id="td2">0s</td>
+        </tr>
+        <tr>
+          <td>每次点击增加：</td>
+          <td id="td3">1次</td>
+        </tr>
+        <tr>
+          <td>联系QQ：</td>
+          <td>1709138965</td>
+        </tr>
+        <tr>
+          <td>制作人：</td>
+          <td>一抹云烟</td>
+        </tr>
+      </table>
+      <p>记录功能使用PHP，没有PHP环境将无法使用</p>
+      
+    <!--输入结构-->
+    </div>
+    <div class="div6" id="div7">
+      
+      <div class="form-floating mb-3 mt-3">
+        <input type="number" class="form-control" id="input1" onblur="tm()" placeholder="请输入时间" value="10">
+        <label for="text">时长(整数单位：s)[最高180s]</label>
+      </div>
+      <div class="form-floating mb-3 mt-3">
+        <input type="number" class="form-control" id="input2" onblur="tm2()" placeholder="请输入次数" value="1">
+        <label for="text">单点次数增加(1~10整数)</label>
+      </div>
+      <div class="div11" id="div11">立即停止测试</div>
+      
+    <!--时间和次数信息-->
+    </div>
+    <div class="div8">
+      <p class="p1" id="p1">时间：10s</p>
+      <p class="p2" id="p2">次数：0次</p>
+    </div>
+    
+    <!--点击按钮结构-->
+    <div class="div9" id="div9">点击我测试</div>
+    <div class="div10" id="div10">开始</div>
+  </body>
+  
+    <script>
+      //获取ID
+      var div3 = document.getElementById("div3");
+      var div4 = document.getElementById("div4");
+      var div5 = document.getElementById("div5");
+      var div6 = document.getElementById("div6");
+      var div7 = document.getElementById("div7");
+      
+      //设置第一个div初始背景颜色
+      div3.style.backgroundColor = "#00c1ff";
+      
+      //创建lishi()函数获取index.json文件数据
+      function lishi(){
+        var https = new XMLHttpRequest();
+          https.onreadystatechange = function (){
+            //转json，设置指定内容输出并修改HTML
+            var txt = JSON.parse(this.responseText);
+            document.getElementById("td").innerHTML = txt.lishi;
+            document.getElementById("td2").innerHTML = txt.Time;
+            document.getElementById("td3").innerHTML = txt.dj;
+          }
+          //请求
+          https.open('GET','index.json');
+          https.send();
+      }
+      
+      //调用lishi函数，修改HTML内容
+      lishi();
+      
+      //创建http()函数，请求PHP响应
+      //设置未知obj值
+      function http(obj,obj1,obj2){
+        var http = new XMLHttpRequest();
+        http.onreadystatechange = function (){
+          lishi();
+        }
+        //联合obj值请求(解决了用户故意单一请求PHP问题)
+        http.open('GET','index.php?ci=' + obj + '&Time=' + obj1 + "&dj=" + obj2);
+        http.send();
+      }
+      
+      //创建ok()函数
+      //设置obj值
+      function ok(obj,obj1,obj2){
+        //obj指定值获取点击事件
+        obj.onclick=function (){
+          //设置指定obj值修改背景颜色
+          obj.style.backgroundColor = "#00c1ff";
+          obj1.style.backgroundColor = "skyblue";
+          obj2.style.backgroundColor = "skyblue";
+          //判断obj值是否相同
+          if(obj == div3){
+            //修改宽高
+            div6.style.height = "0px";
+            div7.style.height = "0px";
+          }
+          else if(obj == div4){
+            //修改宽高
+            div6.style.height = "150px";
+            div7.style.height = "0px";
+          }
+          else if(obj == div5){
+            //修改宽高
+            div6.style.height = "0px";
+            div7.style.height = "300px";
+          }
+        }
+      }
+      
+      //调用ok()函数启用点击事件
+      ok(div3,div4,div5);
+      ok(div4,div3,div5);
+      ok(div5,div3,div4);
+      
+      //获取ID
+      var p1 = document.getElementById("p1");
+      var p2 = document.getElementById("p2");
+      var div9 = document.getElementById("div9");
+      var div10 = document.getElementById("div10");
+      var input1 = document.getElementById("input1");
+      var input2 = document.getElementById("input2");
+      var div11 = document.getElementById("div11");
+      
+      //创建cs()函数
+      function cs(){
+        //定义变量
+        var i = 0;
+        //启用点击事件
+        div9.onclick=function (){
+          //判断of值是否相等
+          if(of == false){
+            null;//相等不运行
+          }else{
+            //否则i变量加input2.value
+            i = i + Number(input2.value);
+            //修改HTML
+            p2.innerHTML = "次数：" + i + "次";
+          }
+        }
+      }
+      //定义of变量
+      var of = false;
+      //设置点击事件
+      div10.onclick=function (){
+        //开始测试，禁止用户再次输入(解决了用户故意作弊问题)
+        input1.disabled = true;
+        input2.disabled = true;
+        //判断of相等就开始测试
+        if(of == false){
+          //开始测试，修改HTML
+          p2.innerHTML = "次数：0次";
+          p1.innerHTML = "时间：" + input1.value + "s";
+          //开始测试，修改停止测试按钮字体颜色
+          div11.style.color = "black";
+          //设置 停止测试 按钮点击事件
+          div11.onclick = function (){
+             //弹出选择框
+             var tishi = confirm("是否停止测试？");
+             //判断是否点击确定
+             if (tishi == true){
+              //确定后设置of值，以便下次测试
+              of = false;
+              //确定后清除时间循环
+              clearInterval(set);
+              //修改自身字体颜色
+              div11.style.color = "#AFAFAF";
+              //修改HTML信息
+              div10.innerHTML = "开始";
+              p2.innerHTML = "次数：0次";
+              p1.innerHTML = "时间：" + input1.value + "s";
+              //调用cs()函数清除点击数据
+              cs();
+              //确定后使用户可再次输入
+              input1.disabled = false;
+              input2.disabled = false;
+              //程序执行完毕，清除自身点击事件
+              div11.onclick = null;
+             }else{
+                //没有点确定，没有事件发生，继续测试
+                null;
+             }
+          }
+          //修改of值，防止再次点击测试(解决了用户故意找事问题)
+          of = true;
+          //定义time变量，并使其等于input1的值
+          var time = Number(input1.value);
+          //修改HTML
+          div10.innerHTML = "测试中…";
+          //调用setInterval()函数循环运行
+          var set = setInterval(function (){
+            time -= 1;//时间减一
+            p1.innerHTML = "时间：" + time + "s";//修改HTML
+            //判断时间等于或小于0时，测试结束
+            if(time <= 0){
+              //弹出相应的数据
+              alert("时间到\n" + p2.innerHTML + "\n用时：" + input1.value + "s");
+              //修改HTML
+              div10.innerHTML = "开始";
+              //测试完毕，关闭 停止测试 按钮
+              div11.onclick = null;
+              div11.style.color = "#afafaf"
+              //测试结束，设置用户可再次输入
+              input1.disabled = false;
+              input2.disabled = false;
+              //调用http()函数进行记录点击数据
+              http(p2.innerHTML,input1.value,input2.value);
+              //调用cs()函数使点击次数为零，以便下次使用
+              cs();
+              //修改of值，使用户可再次点击测试
+              of = false;
+              //清除时间循环
+              clearInterval(set);
+            }
+          },1000);//每秒一次
+        }else{
+          //of值不同将无法开始测试
+          alert("你已经开始测试");
+        }
+      }
+      //调用cs()函数优先初始化点击
+      cs();
+      
+      //创建tm()函数，用于用户输入时间完毕时，判断是否正确输入
+      function tm(){
+        //判断是否可以转化为数字(解决了用户犯贱输入带有e字母的数)
+        //判断输入数字是否小于或等于180(解决了输入时间过大)
+        //判断是否为整数(解决了用户会输入小数的问题)
+        if (Number(input1.value) && input1.value <= 180 && Number.isInteger(Number(input1.value))){
+          //p1.innerHTML = "时间：" + input1.value + "s";
+          //判断是否为负数，以及开头就有 . 的数(解决了用户故意找事问题)
+          if (input1.value[0] != "-" && input1.value[0] != "."){
+            //没有问题将修改HTML进行显示
+            p1.innerHTML = "时间：" + input1.value + "s";
+          }else{
+            //有问题将修用户输入的数据，该为原先默认的数据
+            input1.value = 10;
+            p1.innerHTML = "时间：" + 10 + "s";
+          }
+        }else{
+          //同等道理，有问题将重新修改用户输入数据
+          input1.value = 10;
+          p1.innerHTML = "时间：" + 10 + "s";
+        }
+      }
+      //创建tm2()函数，用于用户输入完毕，判断用户输入单点次数是否正确
+      function tm2(){
+        //下面判断与tm()判断函数一致
+        if (Number(input2.value) && input2.value <= 10){
+          if (input2.value[0] != "-" && input2.value[0] != "." && Number.isInteger(Number(input2.value))){
+            null;
+          }else{
+            input2.value = 1;
+          }
+        }else{
+          input2.value = 1;
+        }
+      }
+    </script>
+  
+</html>
