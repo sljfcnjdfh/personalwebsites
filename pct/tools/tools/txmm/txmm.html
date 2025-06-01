@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>EAN-13条码生成器</title>
+	<style>
+		body {
+			font-family: 'Arial', sans-serif;
+			background-color: #f0f0f0;
+			margin: 0;
+			padding: 20px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			flex-direction: column;
+		}
+		#barcode {
+			max-width: 100%;
+			position: relative;
+			margin-top: 20px;
+		}
+		input[type="number"] {
+			padding: 10px;
+			margin-bottom: 10px;
+			border: 2px solid #ddd;
+			border-radius: 5px;
+			font-size: 16px;
+			width: 200px;
+			box-sizing: border-box;
+			text-align: center;
+		}
+		button,a.button {
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: white;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s ease, box-shadow 0.3s ease;
+			user-select: none;
+		}
+		@madia (hover: hover) {
+			button:hover, a.button:hover {
+				background-color: #0056b3;
+			}
+		}
+		button:active, a.button:active {
+			box-shadow: inset 0 0 10px rgba(18,18,18,0.6);
+			background-color: #0056b3;
+		}
+		a.button {
+			text-decoration: none;
+		}
+		hr {
+			border: 0;
+			height: 1px;
+			background-color: #ccc;
+			width: 100%;
+			margin: 20px 0;
+		}
+	</style>
+</head>
+<body>
+	<input type="number" id="ean_num" placeholder="输入12位或13位数字"><br>
+	<button id="generate_ean_btn">生成EAN-13条码</button>
+	<hr>
+	<a href="#" id="db" download="barcode.png"><canvas id="barcode"></canvas></a>
+	<script>
+		document.querySelector("#generate_ean_btn").addEventListener("click", () => {
+			let data = document.querySelector("#ean_num").value.toString().padStart(12, "0");
+			switch (data.length) {
+				case 12:
+					canvas = generate_barcode_12(data, document.querySelector("#barcode"));
+					canvas.toBlob(function(blob) {
+						const url = window.URL.createObjectURL(blob);
+						document.querySelector("#db").href = url;
+					}, "image/png");
+					break;
+				case 13:
+					canvas = generate_barcode_13(data, document.querySelector("#barcode"));
+					canvas.toBlob(function(blob) {
+						const url = window.URL.createObjectURL(blob);
+						document.querySelector("#db").href = url;
+					}, "image/png");
+					break;
+				default:
+					alert("不要输入长度不为12或13的值，12位由程序自动计算校验位，第13位是手动输入的校验位")
+			}
+		});
+
+		function calculate_barcode_parity_bit(code) {
+			let check_digit = 0;
+			let codeString = code.toString();
+			parseInt(codeString);
+			if (codeString.length != 12) {
+				throw RangeError("Parameter length is not 12.");
+			}
+			codeString.split('').reverse().forEach((item, index) => {
+				check_digit += item * (((index + 1) % 2 == 1) ? 3 : 1);
+			});
+			check_digit = (10 - (check_digit % 10)) % 10;
+			return check_digit;
+		}
+
+		function generate_barcode_12(code, canvasElement) {
+			return generate_barcode_13(code + calculate_barcode_parity_bit(code), canvasElement);
+		}
+
+		function generate_barcode_13(code, canvasElement) {
+			let canvas = canvasElement || document.createElement("canvas");
+			canvas.width = 535;
+			canvas.height = 160;
+			let ctx = canvas.getContext("2d");
+			let pattern = {
+				"bar": [114,102,108,66,92,78,80,68,72,116],
+				"combination": [63,52,50,49,44,38,35,42,41,37]
+			};
+			let first = '';
+			ctx.fillStyle = "#ffffff";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "#000000";
+			ctx.font = '26px Monospace';
+			ctx.fillText(code[0], 8, 150);
+			let x = 30;
+			ctx.fillRect(x, 5, 5, 150);
+			x += 10;
+			ctx.fillRect(x, 5, 5, 150);
+			x += 5;
+			ctx.fillText(code.slice(1, 7), x + 55, 150);
+			code.split('').forEach((item, index) => {
+				if (index === 0) {
+					first = pattern.combination[parseInt(item)].toString(2);
+					return;
+				}
+				let fill = pattern.bar[parseInt(item)].toString(2);
+				if (index <= 6) {
+					if (first[index - 1] == "1") {
+						fill = fill.replace(/1/g, '_').replace(/0/g, '|');
+					} else {
+						fill = fill.split('').reverse().join('').replace(/1/g, '|').replace(/0/g, '_');
+					}
+				} else {
+					fill = fill.replace(/1/g, '|').replace(/0/g, '_');
+				}
+				fill.split('').forEach(i => {
+					if (i == "|") {
+						ctx.fillRect(x, 5, 5, 120);
+						console.log(x);
+					}
+					x += 5;
+				});
+				if (index == 6) {
+					x += 5;
+					ctx.fillRect(x, 5, 5, 150);
+					x += 10;
+					ctx.fillRect(x, 5, 5, 150);
+					x += 10;
+					ctx.fillText(code.slice(7), x + 55, 150);
+				}
+				console.log(fill);
+			});
+			ctx.fillRect(x, 5, 5, 150);
+			x += 10;
+			ctx.fillRect(x, 5, 5, 150);
+			return canvas;
+		}
+	</script>
+</body>
+<div style="text-align: center;">
+    <p>&copy; 2025 李帅站长. 保留所有权利.</p>
+</div>
+</html>

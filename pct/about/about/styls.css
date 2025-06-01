@@ -1,0 +1,76 @@
+/* 通用样式 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fffff3;
+    color: #333;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    min-height: 100vh; /* 使 body 高度占满整个视口 */
+}
+
+/* 容器样式 */
+.sponsor-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 自适应列数 */
+    gap: 20px; /* 卡片间距 */
+    padding: 20px;
+    max-width: 1200px;
+    width: 100%; /* 设置宽度为 90%，避免内容贴边 */
+    margin-left: 6%; /* 向右移动 10% */
+}
+
+/* 卡片样式 */
+.sponsor-card {
+    background-color: #fc6;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 70px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sponsor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 头像样式 */
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+/* 名字样式 */
+.name {
+    font-size: 1.5rem;
+    margin: 10px 0;
+    color: #000;
+}
+
+/* 描述样式 */
+.description {
+    font-size: 1rem;
+    color: #666;
+    margin: 10px 0;
+}
+
+/* 按钮样式 */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007aff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #005bb5;
+}

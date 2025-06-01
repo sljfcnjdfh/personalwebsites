@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Code 128条码生成器</title>
+	<style>
+		body {
+			font-family: 'Arial', sans-serif;
+			background-color: #f0f0f0;
+			margin: 0;
+			padding: 20px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			flex-direction: column;
+		}
+		#barcode {
+			max-width: 100%;
+			position: relative;
+			margin-top: 20px;
+		}
+		input[type="text"] {
+			padding: 10px;
+			margin-bottom: 10px;
+			border: 2px solid #ddd;
+			border-radius: 5px;
+			font-size: 16px;
+			width: 200px;
+			box-sizing: border-box;
+			text-align: center;
+		}
+		button,a.button {
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: white;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s ease, box-shadow 0.3s ease;
+			user-select: none;
+		}
+		@madia (hover: hover) {
+			button:hover, a.button:hover {
+				background-color: #0056b3;
+			}
+		}
+		button:active, a.button:active {
+			box-shadow: inset 0 0 10px rgba(18,18,18,0.6);
+			background-color: #0056b3;
+		}
+		a.button {
+			text-decoration: none;
+		}
+		hr {
+			border: 0;
+			height: 1px;
+			background-color: #ccc;
+			width: 100%;
+			margin: 20px 0;
+		}
+	</style>
+</head>
+<body>
+	<input type="text" id="ean_num" placeholder="大/小写字母、数字、空格、圆/方/花/尖角括号、正/反斜杠、单/双/反引号、加/减/星号、逗号、句点（小数点）、等号，必须全部是半角字符"><br>
+	<label for="printText"><input type="checkbox" id="printText"> 在图片中包含文本</label><br />
+	<button id="generate_ean_btn">生成Code 128条码</button>
+	<hr>
+	<a href="#" id="db" download="barcode.png"><canvas id="barcode"></canvas></a>
+	<script src="code-128-barcode-generation.js"></script>
+	<script>
+		document.querySelector("#generate_ean_btn").addEventListener("click", () => {
+			let data = document.querySelector("#ean_num").value;
+			let canvas = document.getElementById("barcode");
+			let printText = document.getElementById("printText").checked;
+			console.log(code128generator(data, canvas, printText));
+			canvas.toBlob(function(blob) {
+				const url = window.URL.createObjectURL(blob);
+				document.querySelector("#db").href = url;
+			}, "image/png");
+		});
+	</script>
+</body>
+<div style="text-align: center;">
+    <p>&copy; 2025 李帅站长. 保留所有权利.</p>
+</div>
+</html>

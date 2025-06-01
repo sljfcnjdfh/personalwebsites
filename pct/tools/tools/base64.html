@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 加解密工具</title>
+    <style>
+        * {
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Microsoft YaHei', sans-serif; 
+        }
+ 
+        body {
+            min-height: 100vh; 
+            background: linear-gradient(45deg, #81c784, #2e7d32); 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            overflow-x: hidden; 
+        }
+ 
+        .bubble {
+            position: absolute; 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 50%; 
+            animation: float 6s infinite; 
+        }
+ 
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-100px) scale(0.8); }
+        }
+ 
+        header {
+            padding: 2rem; 
+            text-align: center; 
+            color: white; 
+        }
+ 
+        main {
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2rem; 
+        }
+ 
+        .glass-container {
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(15px); 
+            border-radius: 20px; 
+            padding: 2rem; 
+            width: 90%; 
+            max-width: 600px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            margin-bottom: 2rem; 
+        }
+ 
+        input, textarea {
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: rgba(255, 255, 255, 0.9); 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            transition: all 0.3s; 
+        }
+ 
+        input:focus, textarea:focus {
+            outline: none; 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); 
+        }
+ 
+        button {
+            background: #1a73e8; 
+            color: white; 
+            border: none; 
+            padding: 12px 30px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            margin-top: 1rem; 
+        }
+ 
+        button:hover {
+            background: #0d47a1; 
+            transform: scale(1.05); 
+        }
+ 
+        #encryptedResult, #decryptedResult {
+            white-space: nowrap; 
+            overflow: hidden; 
+            border-right: .15em solid orange; 
+            animation: typing 0.5s steps(40, end), blink-caret .75s step-end infinite; 
+        }
+ 
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+ 
+        @keyframes blink-caret { 
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble" style="width: 100px; height: 100px; top: 20%; left: 10%"></div>
+    <div class="bubble" style="width: 80px; height: 80px; top: 60%; right: 15%"></div>
+ 
+    <header>
+        <h1>Base64 加解密工具</h1>
+    </header>
+ 
+    <main>
+        <div class="glass-container">
+            <p style="color: white; margin-bottom: 1rem;">输入要加密的字符</p>
+            <input type="text" id="inputToEncrypt">
+            <p style="color: white; margin-bottom: 1rem;">加密后的 Base64</p>
+            <textarea id="encryptedResult" readonly></textarea>
+            <button onclick="encrypt()">加密</button>
+        </div>
+        <div class="glass-container">
+            <p style="color: white; margin-bottom: 1rem;">用 Base64 加密的字符</p>
+            <input type="text" id="inputToDecrypt">
+            <p style="color: white; margin-bottom: 1rem;">解密后的 Base64 字符</p>
+            <textarea id="decryptedResult" readonly></textarea>
+            <button onclick="decrypt()">解密</button>
+        </div>
+    </main>
+ 
+    <script>
+        function encrypt() {
+            const input = document.getElementById('inputToEncrypt').value; 
+            const encrypted = btoa(input); 
+            document.getElementById('encryptedResult').value = encrypted; 
+        }
+ 
+        function decrypt() {
+            const input = document.getElementById('inputToDecrypt').value; 
+            const decrypted = atob(input); 
+            document.getElementById('decryptedResult').value = decrypted; 
+        }
+    </script>
+</body>
+</html>

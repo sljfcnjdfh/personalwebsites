@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#8B5CF6',
+                        accent: '#EC4899',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .backdrop-blur {
+                backdrop-filter: blur(8px);
+            }
+            .glass-effect {
+                @apply bg-white/20 backdrop-blur shadow-lg rounded-xl border border-white/10;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans text-gray-800 overflow-x-hidden">
+    <!-- 背景图容器 -->
+    <div class="fixed inset-0 -z-10 bg-center" style="background-image: url('背景图3.png'); background-size: cover;">
+        <div class="absolute inset-0 bg-black/30"></div> <!-- 半透明遮罩，提升文字可读性 -->
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 个人资料卡片 -->
+        <div class="glass-effect mb-6 transition-all duration-500 hover:shadow-xl">
+            <div class="flex flex-col md:flex-row items-center p-6">
+                <div class="relative mb-4 md:mb-0 md:mr-6 flex flex-col items-center">
+                    <img src="用户头像.jpg" alt="用户头像" class="w-20 h-20 rounded-full object-cover border-4 border-white/20 shadow-lg">
+                    <h2 id="user-name" class="text-xl font-bold text-white mt-2 text-shadow-md"></h2>
+                </div>
+                
+                <div class="w-full md:w-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-white">
+                        <p class="flex items-center"><i class="fa fa-envelope-o mr-2"></i> Email: <span id="user-email" class="ml-1 font-medium">admin@jianyuan.eu.org</span></p>
+                        <p class="flex items-center"><i class="fa fa-user-o mr-2"></i> 昵称: <span id="user-id" class="ml-1 font-medium">李帅站长</span></p>
+                        <p class="flex items-center"><i class="fa fa-venus-mars mr-2"></i> 性别: <span id="user-expiry" class="ml-1 font-medium">小处男</span></p>
+                        <p class="flex items-center"><i class="fa fa-map-marker mr-2"></i> 来自: <span id="user-secondary-password" class="ml-1 font-medium">北京 朝阳</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自我介绍 -->
+        <div class="glass-effect mb-6 transition-all duration-500 hover:shadow-xl">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                    <i class="fa fa-user-circle-o mr-2"></i> 自我介绍
+                </h2>
+                <p class="text-white/90 leading-relaxed">
+                    一枚初中生，平常喜欢玩电脑，赏析作文/文言文，一览天下之无余，英语趣配音，
+                    喜欢聆听习爷爷的习语，现学习偏中等上，也是一枚脆脆鲨男孩❤
+                </p>
+                <div class="mt-6">
+                    <a href="http://cnm250.cn" class="btn-primary inline-flex items-center">
+                        <i class="fa fa-home mr-2"></i> 返回主页
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片轮播 -->
+        <div class="glass-effect overflow-hidden relative h-[220px] md:h-[300px] rounded-xl transition-all duration-500 hover:shadow-xl">
+            <div id="carousel-container" class="w-full h-full flex transition-transform duration-500 ease-in-out">
+                <img src="356.jpg" alt="展示图片" class="w-full h-full object-contain">
+                <!-- 可以添加更多图片 -->
+                <!-- <img src="image2.jpg" alt="图片2" class="w-full h-full object-contain"> -->
+            </div>
+            
+            <!-- 轮播控制按钮 -->
+            <button id="prev-btn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-70 hover:opacity-100">
+                <i class="fa fa-angle-left text-xl"></i>
+            </button>
+            <button id="next-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-70 hover:opacity-100">
+                <i class="fa fa-angle-right text-xl"></i>
+            </button>
+            
+            <!-- 轮播指示器 -->
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
+                <span class="w-2 h-2 rounded-full bg-white opacity-100"></span>
+                <!-- 为更多图片添加指示器 -->
+                <!-- <span class="w-2 h-2 rounded-full bg-white opacity-50"></span> -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟用户信息数据（实际应从服务器获取）
+        const userInfo = {
+            email: "admin@jianyuan.eu.org",
+            id: "李帅站长",
+            expiry: "小处男",
+            secondaryPassword: "北京 朝阳"
+        };
+
+        // 更新用户信息
+        function updateUserInfo() {
+            document.getElementById('user-name').textContent = userInfo.id;
+            document.getElementById('user-email').textContent = userInfo.email;
+            document.getElementById('user-id').textContent = userInfo.id;
+            document.getElementById('user-expiry').textContent = userInfo.expiry;
+            document.getElementById('user-secondary-password').textContent = userInfo.secondaryPassword;
+        }
+
+        // 图片轮播逻辑（当前仅一张图片，保留扩展能力）
+        const carousel = {
+            container: document.getElementById('carousel-container'),
+            prevBtn: document.getElementById('prev-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            currentIndex: 0,
+            slides: [/* 可以添加更多图片路径 */],
+            
+            init() {
+                // 初始化事件监听
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+                
+                // 触摸滑动支持
+                let startX = 0;
+                let endX = 0;
+                
+                this.container.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                }, false);
+                
+                this.container.addEventListener('touchend', (e) => {
+                    endX = e.changedTouches[0].clientX;
+                    this.handleSwipe();
+                }, false);
+                
+                // 初始化轮播图
+                this.updateSlides();
+            },
+            
+            handleSwipe() {
+                if (startX - endX > 50) {
+                    this.nextSlide();
+                } else if (endX - startX > 50) {
+                    this.prevSlide();
+                }
+                startX = 0;
+                endX = 0;
+            },
+            
+            updateSlides() {
+                // 当前仅一张图片，可扩展为多张
+            },
+            
+            prevSlide() {
+                // 扩展功能：切换到上一张图片
+                console.log("Previous slide");
+            },
+            
+            nextSlide() {
+                // 扩展功能：切换到下一张图片
+                console.log("Next slide");
+            }
+        };
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserInfo();
+            carousel.init();
+            
+            // 添加页面加载动画
+            document.body.classList.add('opacity-0');
+            setTimeout(() => {
+                document.body.classList.add('transition-opacity', 'duration-700');
+                document.body.classList.remove('opacity-0');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
