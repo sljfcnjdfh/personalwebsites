@@ -1,0 +1,1159 @@
+<!DOCTYPE html
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>李帅站长的个人主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+      
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            opacity: 0; 
+            transition: opacity 1s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #2b6cb0;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #1a4971;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2b6cb0;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: #1a4971;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2d3748;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #2b6cb0;
+        }
+
+        .burger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .burger div {
+            width: 25px;
+            height: 3px;
+            background-color: #4a5568;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            background-color: #4c51bf;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background-color: #434190;
+            transform: translateY(-2px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            display: none;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4c51bf;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .logout-btn {
+            margin-left: 10px;
+            color: #e53e3e;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #4a5568;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4c51bf;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #4c51bf;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-submit:hover {
+            background-color: #434190;
+        }
+
+        .form-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .form-message.success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            display: block;
+        }
+
+        .form-message.error {
+            background-color: #fed7d7;
+            color: #c53030;
+            display: block;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding: 150px 0 100px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .about {
+            background-color: white;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-img {
+            flex: 1;
+            text-align: center;
+        }
+
+        .about-img img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .skills {
+            background-color: #f7fafc;
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .skill-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #4c51bf;
+        }
+
+        .projects {
+            background-color: white;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .project-content {
+            padding: 20px;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .project-description {
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .project-link {
+            display: inline-block;
+            font-weight: bold;
+            color: #4c51bf;
+        }
+
+        .contact {
+            background-color: #f7fafc;
+        }
+
+        .contact-options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .contact-option {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 250px;
+            transition: transform 0.3s;
+        }
+
+        .contact-option:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #4c51bf;
+        }
+
+
+        footer {
+            background-color: #2d3748;
+            color: white;
+            padding: 50px 0 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+            margin-bottom: 40px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .social-icon:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @media screen and (max-width: 768px) {
+            .burger {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                right: 0;
+                top: 70px;
+                background-color: white;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                transform: translateX(100%);
+                transition: transform 0.5s ease-in;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .nav-links li {
+                margin: 15px 0;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .about-content {
+                flex-direction: column-reverse;
+                gap: 30px;
+            }
+
+            .projects-grid, .skills-container {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-buttons, .user-profile {
+                position: absolute;
+                top: 70px;
+                right: 20px;
+                background-color: white;
+                padding: 10px;
+                border-radius: 4px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                z-index: 1001;
+                display: none;
+            }
+
+            .auth-buttons.active, .user-profile.active {
+                display: flex;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 1s ease forwards;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 1s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .zoom-in {
+            animation: zoomIn 1s ease forwards;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .bounce {
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .typewriter h1 {
+            overflow: hidden;
+            border-right: .15em solid #fff;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .12em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">李帅站长的个人主页</div>
+                <ul class="nav-links">
+                    <li><a href="#about"><i class="fas fa-user"></i> 关于我</a></li>
+                    <li><a href="#skills"><i class="fas fa-cogs"></i> 技能</a></li>
+                    <li><a href="#projects"><i class="fas fa-briefcase"></i> 项目</a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i> 联系我</a></li>
+                </ul>
+              
+                <div class="auth-buttons" id="authButtons">
+                    <div class="auth-btn" id="authBtn">
+                         本站公告📢
+                    </div>
+                </div>
+              
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-name" id="userName"></div>
+                    <div class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                </div>
+                <div class="burger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </nav>
+        </div>
+        <div id="music" key="67e7a72e941e8" api="https://y.cenguigui.cn/"></div><script id="xplayer" src="https://y.cenguigui.cn/Static/player15/js/player.js" ></script>
+        <link rel="stylesheet" id='font-awesome-css' href="https://cdn.staticfile.net/font-awesome/4.7.0/css/font-awesome.min.css" type='text/css' media='all'>
+        <script src="https://cdn.staticfile.net/jquery/3.5.1/jquery.min.js"></script>
+    </header>
+
+    
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <div class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </div>
+            <h3 class="modal-title">本站公告📢</h3>
+          <p>
+尊敬的各位用户：  
+</br>
+感谢您一直以来对【李帅站点】的支持与关注！为了提供更优质的服务，我们特此通知以下事项：  
+</br>
+1. 系统维护通知</br>
+   ⏰ 时间：2025年6月1日 9:00 - 16:00  </br>
+   📍 内容：服务器升级维护，期间可能出现短暂无法访问的情况。
+</br>
+2. 违规内容整治</br>
+   ❗ 平台将持续清理违规信息，请严格遵守《用户守则》，共同维护良好社区环境。  
+</br>
+3. 联系方式</br>
+   📧 站长邮箱：admin@jianyuan.eu.org</p>
+            </form>
+        </div>
+    </div>
+
+    
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content" data-aos="zoom-in">
+                <img src="img/1.png" alt="个人照片" class="profile-img">
+                <div class="typewriter">
+                    <h1>您好，我是李帅站长</h1>
+                </div>
+                <p>Python开发工程师 | 爬虫设计师 | 自由投稿</p>
+                <a href="#contact" class="btn"><i class="fas fa-paper-plane"></i> 联系我</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="text-center" data-aos="fade-up">关于我</h2>
+            <div class="about-content">
+                <div class="about-text" data-aos="fade-right" data-aos-delay="200">
+                    <p style="text-align: center;">我是一名热爱前端开发的一名初中生，拥有4年的技术经验。我专注于创建得益于改变用户生活、赋予人文关怀的有趣的网站和实用的网站程序。</p>
+                    </br>
+                    <p style="text-align: center;">在学习之余，我喜欢研究最新的前端技术，参与开源项目，并通过写博客分享我的知识和经验。我相信技术的力量在于改善人们的生活，而非取代人类，这也是我学习这个技术的初衷。</p>
+                    </br>
+                    <p><span style="color: blue;">朋友（best）</span>：怪不得…  <span style="color: purple;">(爱捣鼓cf做做py)</span></p></br>
+                    <p><span style="color: blue;">同学：</span>李帅是卡皮巴拉少爷😎</p>
+                </div>
+                <div class="about-img" data-aos="fade-left" data-aos-delay="200">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2 class="text-center" data-aos="fade-up">我的技能</h2>
+            <div class="skills-container">
+                <div class="skill-card" data-aos="flip-left" data-aos-delay="100">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <h3>前端开发</h3>
+                    <p>熟练掌握Python、爬虫和数据分析，能够创建响应式、交互性强的GUI和小游戏。</p>
+                </div>
+                <div class="skill-card" data-aos="flip-left" data-aos-delay="300">
+                    <div class="skill-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h3>UI设计</h3>
+                    <p>具有良好的设计感，能够使用Pygame等工具创建精美的用户界面。</p>
+                </div>
+                <div class="skill-card" data-aos="flip-left" data-aos-delay="400">
+                    <div class="skill-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>响应式设计</h3>
+                    <p>精通响应式设计原则，确保网站在各种设备上都能提供出色的用户体验。</p>
+                </div>
+                <div class="skill-card" data-aos="flip-left" data-aos-delay="400">
+                    <div class="skill-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>在校学生，各项全能</h3>
+                    <p>思维紧密，作文有量；台上明星，华彩四溢</p>
+                </div>
+            </div>
+        </div>
+        <div id="music" key="67e7a72e941e8" api="https://y.cenguigui.cn/"></div><script id="xplayer" src="https://y.cenguigui.cn/Static/player15/js/player.js" ></script>
+        <link rel="stylesheet" id='font-awesome-css' href="https://cdn.staticfile.net/font-awesome/4.7.0/css/font-awesome.min.css" type='text/css' media='all'>
+        <script src="https://cdn.staticfile.net/jquery/3.5.1/jquery.min.js"></script>
+    </section>
+
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2 class="text-center" data-aos="fade-up">我的项目</h2>
+            <div class="projects-grid">
+                <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="project-content">
+                        <h3 class="project-title">在线服务📝</h3>
+                        <p class="project-description">体验有趣的网站和实用的工具</p>
+                        <a href="pct/zpzs/index.html" class="project-link"><i class="fas fa-external-link-alt"></i> 查看项目</a>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="project-content">
+                        <h3 class="project-title">在线工具🛠</h3>
+                        <p class="project-description">具有多项在线工具</p>
+                        <a href="pct/tools/index.html" class="project-link"><i class="fas fa-external-link-alt"></i> 查看项目</a>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="project-content">
+                        <h3 class="project-title">更新日志📋</h3>
+                        <p class="project-description">记录了网站的历史更新记录</p>
+                        <a href="pct/rz/index.html" class="project-link"><i class="fas fa-external-link-alt"></i> 查看项目</a>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="project-content">
+                        <h3 class="project-title">免责声明📝</h3>
+                        <p class="project-description">本站的条款</p>
+                        <a href="pct/mzsm/index.html" class="project-link"><i class="fas fa-external-link-alt"></i> 查看项目</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="text-center" data-aos="fade-up">联系我</h2>
+            <p class="text-center" data-aos="fade-up" data-aos-delay="100">想联系我？不可能，除非你来我个人主页😀</p>
+            <div class="contact-options">
+                <div class="contact-option" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <h3>发送邮件</h3>
+                    <p>admin@jianyuan.eu.org</p>
+                </div>
+                <div class="contact-option" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="contact-icon"><i class="fa-brands fa-qq"></i></div>
+                    <h3>国内企鹅</h3>
+                    <p>QQ：1160299306</p>
+                </div>
+                <div class="contact-option" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="contact-icon"><i class="fas fa-comments"></i></div>
+                    <h3>加密纸飞机</h3>
+                    <p>大胆！谁让你加我的，跪下！😄</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content" data-aos="fade-up">
+                <h3>李帅站长的博客</h3>
+                <p>感谢您的访问</p>
+            </div>
+            <div class="social-links" data-aos="fade-up" data-aos-delay="100">
+                <a href="#" class="social-icon"><i class="fab fa-weixin"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-weibo"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-zhihu"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div class="copyright" data-aos="fade-up" data-aos-delay="200">
+                <p>&copy; 2025 李帅站长 保留所有权利</p>
+            </div>
+        </div>
+        <div style="text-align: center;">
+</div>
+                    本站已安全运行：<span id="momk"></span>
+                    <script language="javascript">
+                        function star() {
+                            window.location.href = './websigned.mobileconfig';
+                            setTimeout(function () {
+                                window.location.href = "./udid/embedded2.mobileprovision";
+                            }, 3000);
+                        }
+                        function show_date_time() {
+                            window.setTimeout("show_date_time()", 1000);
+                            BirthDay = new Date("2024/3/5");
+                            today = new Date();
+                            timeold = (today.getTime() - BirthDay.getTime());
+                            sectimeold = timeold / 1000
+                            secondsold = Math.floor(sectimeold);
+                            msPerDay = 24 * 60 * 60 * 1000
+                            e_daysold = timeold / msPerDay
+                            daysold = Math.floor(e_daysold);
+                            e_hrsold = (daysold - e_daysold) * -24;
+                            hrsold = Math.floor(e_hrsold);
+                            e_minsold = (hrsold - e_hrsold) * -60;
+                            minsold = Math.floor((hrsold - e_hrsold) * -60);
+                            seconds = Math.floor((minsold - e_minsold) * -60);
+                            momk.innerHTML = daysold + "天" + hrsold + "小时" + minsold + "分" + seconds + "秒";
+                        }
+                        show_date_time();
+                    </script>
+
+<style>
+                        #momk {
+                            animation: change 10s infinite;
+                            font-weight: 500;
+                        }
+
+                        @keyframes change {
+                            100% {
+                                color: #7fb7be;
+                            }
+
+                            75% {
+                                color: #2a628f;
+                            }
+
+                            50% {
+                                color: #c49799;
+                            }
+
+                            25% {
+                                color: #e5625e;
+                            }
+
+                            0% {
+                                color: #7880b5;
+                            }
+                        }
+                    </style>
+            </div>
+    </footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease',
+                once: true
+            });
+        });
+
+       
+        window.addEventListener('load', function() {
+            
+            const loaderWrapper = document.querySelector('.loader-wrapper');
+            loaderWrapper.classList.add('loader-hidden');
+            
+            
+            document.body.style.opacity = '1';
+            
+           
+            loaderWrapper.addEventListener('transitionend', function() {
+                if (loaderWrapper.parentNode) {
+                    loaderWrapper.parentNode.removeChild(loaderWrapper);
+                }
+            });
+
+            
+            checkLoginStatus();
+        });
+
+       
+        const burger = document.querySelector('.burger');
+        const nav = document.querySelector('.nav-links');
+        
+        burger.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            
+            
+            const authButtons = document.getElementById('authButtons');
+            const userProfile = document.getElementById('userProfile');
+            
+            if (userProfile.style.display === 'flex') {
+                userProfile.classList.toggle('active');
+            } else {
+                authButtons.classList.toggle('active');
+            }
+        });
+
+      
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('active');
+            });
+        });
+
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        
+        const authBtn = document.getElementById('authBtn');
+        const authModal = document.getElementById('authModal');
+        const modalClose = document.getElementById('modalClose');
+        const authForm = document.getElementById('authForm');
+        const formMessage = document.getElementById('formMessage');
+        const userProfile = document.getElementById('userProfile');
+        const authButtons = document.getElementById('authButtons');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+       
+        authBtn.addEventListener('click', () => {
+            authModal.classList.add('active');
+        });
+
+        
+        modalClose.addEventListener('click', () => {
+            authModal.classList.remove('active');
+            formMessage.className = 'form-message';
+            formMessage.textContent = '';
+            authForm.reset();
+        });
+
+      
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.remove('active');
+                formMessage.className = 'form-message';
+                formMessage.textContent = '';
+                authForm.reset();
+            }
+        });
+
+        
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+           
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            
+           
+            if (users[username]) {
+               
+                if (users[username].password === password) {
+                  
+                    formMessage.className = 'form-message success';
+                    formMessage.textContent = '登录成功！';
+                    
+                 
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        username: username,
+                        loginTime: new Date().getTime()
+                    }));
+                    
+                   
+                    updateUserUI(username);
+                    
+                  
+                    setTimeout(() => {
+                        authModal.classList.remove('active');
+                        authForm.reset();
+                    }, 1500);
+                } else {
+                 
+                    formMessage.className = 'form-message error';
+                    formMessage.textContent = '密码错误，请重试！';
+                }
+            } else {
+              
+                users[username] = {
+                    password: password,
+                    createdAt: new Date().getTime()
+                };
+                
+               
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: username,
+                    loginTime: new Date().getTime()
+                }));
+                
+              
+                updateUserUI(username);
+                
+                
+                formMessage.className = 'form-message success';
+                formMessage.textContent = '注册成功并已自动登录！';
+                
+               
+                setTimeout(() => {
+                    authModal.classList.remove('active');
+                    authForm.reset();
+                }, 1500);
+            }
+        });
+
+      
+        logoutBtn.addEventListener('click', () => {
+         
+            localStorage.removeItem('currentUser');
+            
+            
+            authButtons.style.display = 'flex';
+            userProfile.style.display = 'none';
+            
+            
+            alert('已成功退出登录！');
+        });
+
+      
+        function checkLoginStatus() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser && currentUser.username) {
+                
+                updateUserUI(currentUser.username);
+            }
+        }
+
+     
+        function updateUserUI(username) {
+            
+            userAvatar.textContent = username.charAt(0).toUpperCase();
+            userName.textContent = username;
+            
+            
+            authButtons.style.display = 'none';
+            userProfile.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
